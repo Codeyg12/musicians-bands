@@ -16,8 +16,30 @@ const seedSong = [
   { title: "Darling", year: 2015, length: 238 },
 ];
 
+const seedManager = [
+  {
+    name: "Bob",
+    email: "bob@example.com",
+    salary: 100000,
+    dateHired: "2021-01-01",
+  },
+  {
+    name: "Alice",
+    email: "alice@example.com",
+    salary: 90000,
+    dateHired: "2021-10-20",
+  },
+  {
+    name: "Charlie",
+    email: "charlie@example.com",
+    salary: 80000,
+    dateHired: "2021-05-15",
+  },
+];
+
 module.exports = {
   seedBand,
   seedMusician,
   seedSong,
+  seedManager,
 };

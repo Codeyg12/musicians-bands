@@ -1,6 +1,6 @@
 const { sequelize } = require("./db");
-const { Band, Musician, Song } = require("./index");
-const { seedBand, seedMusician, seedSong } = require("./seedData");
+const { Band, Musician, Song, Manager } = require("./index");
+const { seedBand, seedMusician, seedSong, seedManager } = require("./seedData");
 
 describe("Band, Musician, and Song Models", () => {
   /**
@@ -9,6 +9,7 @@ describe("Band, Musician, and Song Models", () => {
   let bands;
   let musicians;
   let songs;
+  let managers;
   const randomNum = Math.floor(Math.random() * 3);
   beforeAll(async () => {
     // the 'sync' method will create tables based on the model class
@@ -19,6 +20,7 @@ describe("Band, Musician, and Song Models", () => {
     bands = await Band.bulkCreate(seedBand);
     musicians = await Musician.bulkCreate(seedMusician);
     songs = await Song.bulkCreate(seedSong);
+    managers = await Manager.bulkCreate(seedManager);
   });
 
   describe("band tests", () => {
@@ -79,6 +81,29 @@ describe("Band, Musician, and Song Models", () => {
     });
   });
 
+  describe("manager tests", () => {
+    test("can create a Manager", async () => {
+      expect(managers[0]).toBeInstanceOf(Manager);
+    });
+
+    test("can update a Manager", async () => {
+      await managers[0].update({ name: "Scooter Braun" });
+      expect(managers[0].name).toBe("Scooter Braun");
+    });
+
+    test("can delete a Manager", async () => {
+      const newManager = await Manager.create({
+        name: "Mike Mikeson",
+        email: "mike@example.com",
+        salary: 200000,
+        dateHired: "2021-01-01",
+      });
+      await newManager.destroy();
+      const allManagers = await Manager.findAll();
+      expect(allManagers).toHaveLength(3);
+    });
+  });
+
   describe("counting tests", () => {
     test("can increment showCount", async () => {
       await bands[0].increment("showCount", { by: 10 });
@@ -127,6 +152,10 @@ describe("Band, Musician, and Song Models", () => {
         expect(bandMembers[0]).toEqual(expect.objectContaining({ BandId: 1 }));
         expect(bandMembers[1]).toEqual(expect.objectContaining({ BandId: 1 }));
       });
+      test("eager loading works", async () => {
+        const band = await Band.findByPk(1, { include: Musician });
+        expect(band.Musicians).toHaveLength(2);
+      });
     });
 
     describe("Band and Song", () => {
@@ -141,17 +170,17 @@ describe("Band, Musician, and Song Models", () => {
 
         await band1.addSongs([song1, song2]);
         await band2.addSongs([song1]);
-        
+
         band1Songs = await band1.getSongs();
         band2Songs = await band2.getSongs();
-      })
-       test("multiple songs can be added to a band", () => {
-          expect(band1Songs).toHaveLength(2);
-       });
-       test("multiple bands can have the same song", () => {
+      });
+      test("multiple songs can be added to a band", () => {
+        expect(band1Songs).toHaveLength(2);
+      });
+      test("multiple bands can have the same song", () => {
         expect(band1Songs[0].title).toEqual(songs[0].title);
         expect(band2Songs[0].title).toEqual(songs[0].title);
-       });
+      });
     });
   });
 });
