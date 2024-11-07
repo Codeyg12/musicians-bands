@@ -6,6 +6,9 @@ const { Song } = require("./models/Song");
 Musician.belongsTo(Band);
 Band.hasMany(Musician);
 
+Song.belongsToMany(Band, { through: 'BandSongs' });
+Band.belongsToMany(Song, { through: 'BandSongs' });
+
 module.exports = {
   Band,
   Musician,

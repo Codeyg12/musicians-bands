@@ -128,5 +128,30 @@ describe("Band, Musician, and Song Models", () => {
         expect(bandMembers[1]).toEqual(expect.objectContaining({ BandId: 1 }));
       });
     });
+
+    describe("Band and Song", () => {
+      let band1Songs;
+      let band2Songs;
+
+      beforeAll(async () => {
+        const song1 = await Song.findByPk(1);
+        const song2 = await Song.findByPk(2);
+        const band1 = await Band.findByPk(1);
+        const band2 = await Band.findByPk(2);
+
+        await band1.addSongs([song1, song2]);
+        await band2.addSongs([song1]);
+        
+        band1Songs = await band1.getSongs();
+        band2Songs = await band2.getSongs();
+      })
+       test("multiple songs can be added to a band", () => {
+          expect(band1Songs).toHaveLength(2);
+       });
+       test("multiple bands can have the same song", () => {
+        expect(band1Songs[0].title).toEqual(songs[0].title);
+        expect(band2Songs[0].title).toEqual(songs[0].title);
+       });
+    });
   });
 });
